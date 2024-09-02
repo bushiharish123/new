@@ -1,6 +1,7 @@
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import Sport from '../models/Soprts';
 
 dotenv.config();
 
@@ -32,3 +33,15 @@ export const loginUser = async (email: string, password: string) => {
 
   return { token, isAthlet: user.isAthlet };
 };
+export const sportsList = async (req:any,res:any)=>{
+  try {
+    const sportsList = await Sport.find(); // Query to get all sports documents
+    res.send('MongoDB connected successfully!');
+    console.log('List Of Sports',JSON.stringify(sportsList))
+    res.send(sportsList)
+    res.json(sportsList); // Send the sports list as JSON
+
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving sports', error });
+  }
+}

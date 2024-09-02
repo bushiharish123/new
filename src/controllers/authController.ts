@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser } from '../services/authService';
+import { registerUser, loginUser, sportsList } from '../services/authService';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -18,6 +18,11 @@ export const login = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
-export const test= async(req:Request,res:Response)=>{
-  
+export const getSports= async(req:Request,res:Response)=>{
+  try {
+    const list = await sportsList(req,res);
+    res.json(list);
+  } catch (error:any) {
+    res.status(400).json({ error: error.message });
+  }
 }
