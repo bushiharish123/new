@@ -36,9 +36,9 @@ export const loginUser = async (email: string, password: string) => {
 export const sportsList = async (req:any,res:any)=>{
   try {
     const sportsList = await Sport.find(); // Query to get all sports documents
-    res.send('MongoDB connected successfully!');
+    // res.send('MongoDB connected successfully!');
     console.log('List Of Sports',JSON.stringify(sportsList))
-    res.send(sportsList)
+    // res.send(sportsList)
     res.json(sportsList); // Send the sports list as JSON
 
   } catch (error) {
