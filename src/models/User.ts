@@ -6,6 +6,12 @@ interface IUser extends Document {
   lastName: string;
   email: string;
   password: string;
+  age: number;
+  height:number;
+  gender:string;
+  futureGoals:string;
+  achievements:string;
+  sports:string[];
   isAthlet: boolean;
   matchPassword(password: string): Promise<boolean>;
 }
@@ -15,6 +21,12 @@ const UserSchema: Schema = new Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  age: { type: Number, required: true },
+  height:{ type: Number, required: true },
+  gender:{ type: String, required: true },
+  futureGoals:{ type: String, required: false },
+  achievements:{ type: String, required: false },
+  sports: { type: [String], required: true },
   isAthlet: { type: Boolean, default: false },
 });
 

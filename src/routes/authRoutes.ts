@@ -12,7 +12,7 @@ router.post('/register', registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
 
 // Apply the `verifyToken` middleware to protect these routes
-router.get('/sports', verifyToken, getSports);
+router.get('/sports', getSports);
 router.get('/searchByName', verifyToken, searchByName);
 router.post('/insert-sports', verifyToken, async (req, res) => {
   // Example route to insert sports, protected by the middleware

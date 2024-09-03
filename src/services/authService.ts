@@ -12,13 +12,30 @@ interface RegisterUser {
   lastName: string;
   email: string;
   password: string;
+  age: number;
+  height:number;
+  gender:string;
+  sports: string[];
+  futureGoals?:string;
+  achievements?:string;
   isAthlet?: boolean;
 }
 
 export const registerUser = async (userData: RegisterUser) => {
+  // Check if a user already exists with the same firstName and lastName (case-insensitive)
+  const existingUser = await User.findOne({
+    firstName: { $regex: new RegExp(`^${userData.firstName}$`, "i") },
+    lastName: { $regex: new RegExp(`^${userData.lastName}$`, "i") },
+  });
+
+  if (existingUser) {
+    throw new Error("User with the same name already exists.");
+  }
+
   const user = new User(userData);
   return await user.save();
 };
+
 
 export const loginUser = async (email: string, password: string) => {
   const user = await User.findOne({ email });
