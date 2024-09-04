@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { registerUser, loginUser, sportsList, searchByNames } from '../services/authService';
+import { blacklist } from '../middleware/authMiddleware';
 export const register = async (req: Request, res: Response) => {
   try {
     const user = await registerUser(req.body);
@@ -34,3 +35,15 @@ export const searchByName = async(req:Request,res:Response)=>{
     res.status(400).json({ error: error.message });
   }
 }
+export const logout = (req: Request, res: Response) => {
+  const token = req.header('Authorization')?.split(' ')[1];
+
+  if (!token) {
+    return res.status(400).json({ message: 'No token provided' });
+  }
+
+  // Add the token to the blacklist
+  blacklist.add(token);
+
+  res.status(200).json({ message: 'User logged out successfully' });
+};

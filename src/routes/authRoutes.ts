@@ -2,7 +2,7 @@
 
 import express from 'express';
 import { registerValidation, loginValidation, validate } from '../utils/validate';
-import { register, login, getSports, searchByName } from '../controllers/authController';
+import { register, login, getSports, searchByName, logout } from '../controllers/authController';
 import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 import Sport from '../models/Soprts';
 
@@ -14,6 +14,7 @@ router.post('/login', loginValidation, validate, login);
 // Apply the `verifyToken` middleware to protect these routes
 router.get('/sports', getSports);
 router.get('/searchByName', verifyToken, searchByName);
+router.get('/logout', verifyToken, logout);
 router.post('/insert-sports', verifyToken, async (req, res) => {
   // Example route to insert sports, protected by the middleware
   const sports = [
