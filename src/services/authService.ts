@@ -51,7 +51,7 @@ export const loginUser = async (email: string, password: string) => {
     { expiresIn: '1h' }
   );
 
-  return { token, isAthlet: user.isAthlet };
+  return { token, userDetails: user };
 };
 
 export const sportsList = async (req: any, res: any) => {
