@@ -11,6 +11,7 @@ interface IUser extends Document {
   gender:string;
   futureGoals:string;
   achievements:string;
+  school:string;
   sports:string[];
   isAthlet: boolean;
   matchPassword(password: string): Promise<boolean>;
@@ -27,6 +28,7 @@ const UserSchema: Schema = new Schema({
   futureGoals:{ type: String, required: false },
   achievements:{ type: String, required: false },
   sports: { type: [String], required: true },
+  school:{type: String, required: false},
   isAthlet: { type: Boolean, default: false },
 });
 

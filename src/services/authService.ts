@@ -1,6 +1,7 @@
 // services/authService.ts
 
 import User from '../models/User';
+import UserAsAgent from '../models/UserAsAgent';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Sport from '../models/Soprts';
@@ -20,25 +21,46 @@ interface RegisterUser {
   achievements?:string;
   isAthlet?: boolean;
 }
+interface registerUserAsAgent {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  professionalBackground:string;
+  descriptions:string;
+  specialization:string
+  isAthlet?: boolean;
+}
 
 export const registerUser = async (userData: RegisterUser) => {
   // Check if a user already exists with the same firstName and lastName (case-insensitive)
   const existingUser = await User.findOne({
-    firstName: { $regex: new RegExp(`^${userData.firstName}$`, "i") },
-    lastName: { $regex: new RegExp(`^${userData.lastName}$`, "i") },
+    email: { $regex: new RegExp(`^${userData.email}$`, "i") }
   });
 
   if (existingUser) {
-    throw new Error("User with the same name already exists.");
+    throw new Error("User with the same email already exists.");
   }
 
   const user = new User(userData);
   return await user.save();
 };
+export const registerUserAsAgent = async(userData: registerUserAsAgent)=>{
+  const existingUser = await UserAsAgent.findOne({
+    email: { $regex: new RegExp(`^${userData.email}$`, "i") }
+  });
+
+  if (existingUser) {
+    throw new Error("User as agent with the same email already exists.");
+  }
+
+  const user = new UserAsAgent(userData);
+  return await user.save();
+}
 
 
-export const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email });
+export const loginUser = async (email: string, password: string,isAthlet:boolean) => {
+  const user = isAthlet?await User.findOne({ email }):await UserAsAgent.findOne({ email });
   if (!user) throw new Error('Invalid credentials');
 
   const isMatch = await user.matchPassword(password);
@@ -60,8 +82,8 @@ export const sportsList = async (req: any, res: any) => {
     console.log('List Of Sports', JSON.stringify(sportsList));
     res.json(sportsList); // Send the sports list as JSON
   } catch (error) {
-    res.status(500).json({ message: 'Error retrieving sports', error });
-  }
+    throw new Error("User with the same email already exists.");
+    }
 };
 
 export const searchByNames = async (req: any) => {
