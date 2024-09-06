@@ -5,7 +5,6 @@ import { registerValidation, loginValidation, validate } from '../utils/validate
 import { register, login, getSports, searchByName, logout, uploadProfilePicture } from '../controllers/authController';
 import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 import Sport from '../models/Soprts';
-import upload from '../middleware/uploadMiddleware';
 
 const router = express.Router();
 
@@ -16,7 +15,7 @@ router.post('/login', loginValidation, validate, login);
 router.get('/sports', getSports);
 router.get('/searchByName', verifyToken, searchByName);
 router.get('/logout', verifyToken, logout);
-router.post('/uploadProfilePic', upload.single('profilePic'), uploadProfilePicture)
+// router.post('/uploadProfilePic', upload.single('profilePic'), uploadProfilePicture)
 router.post('/insert-sports', verifyToken, async (req, res) => {
   // Example route to insert sports, protected by the middleware
   const sports = [
