@@ -2,7 +2,7 @@
 
 import express from 'express';
 import { registerValidation, loginValidation, validate } from '../utils/validate';
-import { register, login, getSports, searchByName, logout, uploadProfilePicture } from '../controllers/authController';
+import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent } from '../controllers/authController';
 import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 import Sport from '../models/Soprts';
 
@@ -13,7 +13,8 @@ router.post('/login', loginValidation, validate, login);
 
 // Apply the `verifyToken` middleware to protect these routes
 router.get('/sports', getSports);
-router.get('/searchByName', verifyToken, searchByName);
+router.get('/athletSearch', verifyToken, searchByName);
+router.get('/agentSearch', verifyToken, searchByNameForAgent);
 router.get('/logout', verifyToken, logout);
 // router.post('/uploadProfilePic', upload.single('profilePic'), uploadProfilePicture)
 router.post('/insert-sports', verifyToken, async (req, res) => {

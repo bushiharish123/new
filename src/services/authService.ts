@@ -87,19 +87,62 @@ export const sportsList = async (req: any, res: any) => {
 };
 
 export const searchByNames = async (req: any) => {
-  let user;
-  if (req.body.firstName) {
-    const firstName = req.body.firstName;
-    user = await User.findOne({ firstName });
-  } else if (req.body.lastName) {
-    const lastName = req.body.lastName;
-    user = await User.findOne({ lastName });
-  } else if (req.body.email) {
-    const email = req.body.email;
-    user = await User.findOne({ email });
+  let users; // To handle multiple results
+
+  const searchTerm = req.query.searchTerm; // The search term from query parameters
+
+  // If no search term is provided, return an empty response or error
+  if (!searchTerm) {
+    throw new Error('Please provide a search term.');
   }
 
-  if (!user) throw new Error('User not found');
-  console.log(user);
-  return user;
+  // Use the $or operator to search in firstName, lastName, and email fields
+  const query = {
+    $or: [
+      { firstName: { $regex: searchTerm, $options: 'i' } }, // Case-insensitive search in firstName
+      { lastName: { $regex: searchTerm, $options: 'i' } },  // Case-insensitive search in lastName
+      { email: { $regex: searchTerm, $options: 'i' } }      // Case-insensitive search in email
+    ]
+  };
+
+  // Fetch the users based on the dynamic query
+  users = await User.find(query);
+
+  if (!users || users.length === 0) {
+    throw new Error('No users found'); // Return error if no user matches
+  }
+
+  console.log(users);
+  return users; // Return the list of users
 };
+export const agentSearches = async (req: any) => {
+  let users; // To handle multiple results
+
+  const searchTerm = req.query.searchTerm; // The search term from query parameters
+
+  // If no search term is provided, return an empty response or error
+  if (!searchTerm) {
+    throw new Error('Please provide a search term.');
+  }
+
+  // Use the $or operator to search in firstName, lastName, and email fields
+  const query = {
+    $or: [
+      { firstName: { $regex: searchTerm, $options: 'i' } }, // Case-insensitive search in firstName
+      { lastName: { $regex: searchTerm, $options: 'i' } },  // Case-insensitive search in lastName
+      { email: { $regex: searchTerm, $options: 'i' } }      // Case-insensitive search in email
+    ]
+  };
+
+  // Fetch the users based on the dynamic query
+  users = await UserAsAgent.find(query);
+
+  if (!users || users.length === 0) {
+    throw new Error('No users found'); // Return error if no user matches
+  }
+
+  console.log(users);
+  return users; // Return the list of users
+};
+
+
