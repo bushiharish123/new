@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches } from '../services/authService';
+import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
 export const register = async (req: Request, res: Response) => {
@@ -42,6 +42,14 @@ export const searchByNameForAgent = async(req:Request,res:Response)=>{
     const details = await agentSearches(req);
     res.json(details);
   }catch (error:any) {
+    res.status(400).json({ error: error.message });
+  }
+}
+export const getRecommendedUser = async(req:Request,res:Response)=>{
+  try {
+    const users = await getRecommendedUsers(req);
+    res.json(users);
+  } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 }
