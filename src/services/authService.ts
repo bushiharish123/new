@@ -181,3 +181,38 @@ export const getRecommendedUsers = async (req: any) => {
 
   return users; // Return the list of users
 };
+export const getRecommendedForAgents = async (req: any) => {
+  // Extract email from query parameters
+  const { email } = req.query;
+
+  if (!email) {
+    throw new Error('Email parameter is required.');
+  }
+
+  // Find the user by email
+  const user = await UserAsAgent.findOne({ email });
+
+  if (!user) {
+    throw new Error('User not found.');
+  }
+
+  const sportsList = user.specialization; // Get the sports list from the found user
+
+  if (!sportsList || sportsList.length === 0) {
+    throw new Error('User has no sports associated.');
+  }
+
+  // Create a query to find users whose sports match any of the provided sports
+  const query = {
+    sports: { $in: sportsList }, // Use MongoDB's $in operator to match any sport in the sports array
+  };
+
+  // Fetch users who match the query
+  const users = await User.find(query);
+
+  if (!users || users.length === 0) {
+    throw new Error('No users found with matching sports.');
+  }
+
+  return users; // Return the list of users
+};
