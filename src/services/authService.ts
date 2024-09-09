@@ -176,7 +176,7 @@ export const getRecommendedUsers = async (req: any) => {
   const users = await UserAsAgent.find(query);
 
   if (!users || users.length === 0) {
-    throw new Error('No users found with matching sports.');
+    return [];
   }
 
   return users; // Return the list of users
@@ -211,7 +211,7 @@ export const getRecommendedForAgents = async (req: any) => {
   const users = await User.find(query);
 
   if (!users || users.length === 0) {
-    throw new Error('No users found with matching sports.');
+   return [];
   }
 
   return users; // Return the list of users
