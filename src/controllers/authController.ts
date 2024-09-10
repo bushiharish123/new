@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents } from '../services/authService';
+import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
 export const register = async (req: Request, res: Response) => {
@@ -45,6 +45,22 @@ export const searchByNameForAgent = async(req:Request,res:Response)=>{
     res.status(400).json({ error: error.message });
   }
 }
+export const getAthletRatings = async(req:Request,res:Response)=>{
+  try{
+    const details = await getAthletRating(req,res);
+    res.json(details);
+  }catch (error:any) {
+    res.status(400).json({ error: error.message });
+  }
+}
+export const getAgentRatings = async(req:Request,res:Response)=>{
+  try{
+    const details = await getAgentRating(req,res);
+    res.json(details);
+  }catch (error:any) {
+    res.status(400).json({ error: error.message });
+  }
+}
 export const getRecommendedUser = async(req:Request,res:Response)=>{
   try {
     const users = await getRecommendedUsers(req);
@@ -61,6 +77,22 @@ export const getRecommendedForAgent = async(req:Request,res:Response)=>{
     res.status(400).json({ error: error.message });
   }
 }
+export const ratingForAgent = async (req: Request, res: Response) => {
+  try {
+    const rate = await ratingForAgents(req.body);
+    res.status(200).json({ message: 'Rated Successfully', rate });
+  } catch (error:any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export const ratingForAthlet = async (req: Request, res: Response) => {
+  try {
+    const rate = await ratingForAthlets(req.body);
+    res.status(200).json({ message: 'Rated Successfully', rate });
+  } catch (error:any) {
+    res.status(400).json({ error: error.message });
+  }
+};
 export const logout = (req: Request, res: Response) => {
   const token = req.header('Authorization')?.split(' ')[1];
 

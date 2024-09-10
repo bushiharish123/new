@@ -5,6 +5,8 @@ import UserAsAgent from '../models/UserAsAgent';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Sport from '../models/Soprts';
+import AgentRating from '../models/AgentRating';
+import AthletRating from '../models/athletRating';
 
 dotenv.config();
 
@@ -30,6 +32,20 @@ interface registerUserAsAgent {
   descriptions:string;
   specialization:string
   isAthlet?: boolean;
+}
+interface agentRating {
+  userId: string;   
+    agentId: string;  
+    rating: number;   
+    feedback?: string; 
+    createdAt: Date;  
+}
+interface athletRating {
+  agentId : string;   
+  userId: string;  
+    rating: number;   
+    feedback?: string; 
+    createdAt: Date;  
 }
 
 export const registerUser = async (userData: RegisterUser) => {
@@ -215,4 +231,58 @@ export const getRecommendedForAgents = async (req: any) => {
   }
 
   return users; // Return the list of users
+};
+export const ratingForAgents=async (rating:agentRating) => {
+  const rate = new AgentRating(rating);
+  await rate.save();
+  return ;
+
+};
+export const ratingForAthlets=async (rating:athletRating) => {
+  const rate = new AthletRating(rating);
+  await rate.save();
+  return ;
+
+};
+export const getAthletRating=async (req:any,res:any) => {
+  const query = {
+    userId: req.query.userId, // Use MongoDB's $in operator to match any sport in the sports array
+  };
+  const ratings = await AthletRating.find(query)
+  const averageRating = await AthletRating.aggregate([
+    { $match: { userId: req.query.userId } }, // Filter by the agentId
+    {
+      $group: {
+        _id: "$userId", // Group by agentId
+        averageRating: { $avg: "$rating" } // Calculate the average rating
+      }
+    }
+  ]);
+  
+  if (!ratings || ratings.length === 0) {
+    throw new Error('No ratings are there for the athlet');
+  }
+  return {ratings,averageRating};
+
+};
+export const getAgentRating=async (req:any,res:any) => {
+  const query = {
+    agentId: req.query.agentId, // Use MongoDB's $in operator to match any sport in the sports array
+  };
+  const ratings = await AgentRating.find(query)
+  const averageRating = await AgentRating.aggregate([
+    { $match: { agentId: req.query.agentId } }, // Filter by the agentId
+    {
+      $group: {
+        _id: "$agentId", // Group by agentId
+        averageRating: { $avg: "$rating" } // Calculate the average rating
+      }
+    }
+  ]);
+  
+  if (!ratings || ratings.length === 0) {
+    throw new Error('No ratings are there for the agent');
+  }
+  return {ratings,averageRating};
+
 };

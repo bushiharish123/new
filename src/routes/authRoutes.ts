@@ -2,7 +2,7 @@
 
 import express from 'express';
 import { registerValidation, loginValidation, validate } from '../utils/validate';
-import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent, getRecommendedUser, getRecommendedForAgent } from '../controllers/authController';
+import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent, getRecommendedUser, getRecommendedForAgent, ratingForAgent, ratingForAthlet, getAthletRatings, getAgentRatings } from '../controllers/authController';
 import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 import Sport from '../models/Soprts';
 
@@ -10,6 +10,8 @@ const router = express.Router();
 
 router.post('/register', registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
+router.post('/agentRating',verifyToken,ratingForAgent);
+router.post('/athletRating',verifyToken,ratingForAthlet);
 
 // Apply the `verifyToken` middleware to protect these routes
 router.get('/sports', getSports);
@@ -18,6 +20,8 @@ router.get('/agentSearch', verifyToken, searchByNameForAgent);
 router.get('/logout', verifyToken, logout);
 router.get('/recommendations',verifyToken,getRecommendedUser);
 router.get('/recommendationsForAgent',verifyToken,getRecommendedForAgent);
+router.get('/getAthletRating',verifyToken,getAthletRatings);
+router.get('/getAgentRating',verifyToken,getAgentRatings)
 
 // router.post('/uploadProfilePic', upload.single('profilePic'), uploadProfilePicture)
 router.post('/insert-sports', verifyToken, async (req, res) => {
