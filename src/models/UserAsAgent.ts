@@ -9,6 +9,7 @@ interface IuserAsAgent extends Document {
     professionalBackground:string;
     descriptions:string;
     specialization:string[];
+    profilePic?: string;
     isAthlet?: boolean;
   matchPassword(password: string): Promise<boolean>;
 }
@@ -22,6 +23,7 @@ const UserAsAgentSchema: Schema = new Schema({
   descriptions:{ type: String, required: false },
   specialization:{type: [String], required: false},
   isAthlet: { type: Boolean, default: false },
+  profilePic: { type: String, required: false }
 });
 
 UserAsAgentSchema.pre<IuserAsAgent>('save', async function (next) {

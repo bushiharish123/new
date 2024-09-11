@@ -9,6 +9,7 @@ import Sport from '../models/Soprts';
 import multer, { StorageEngine } from 'multer';
 import path from 'path';
 import User from '../models/User';
+import UserAsAgent from '../models/UserAsAgent';
 
 const router = express.Router();
 
@@ -63,6 +64,47 @@ router.put('/profile', upload.single('profilePic'), async (req: UpdateUserProfil
         lastName,
         achievements,
         futureGoals,
+        ...(profilePic && { profilePic }), // Only include profilePic if it was uploaded
+      },
+      { new: true, runValidators: true } // Return the updated document
+    ).select('firstName lastName achievements futureGoals profilePic email age height gender sports school isAthlet');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with the updated fields
+    res.json({
+      message: 'Profile updated successfully',
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating profile', error: (error as Error).message });
+  }
+});
+
+interface UpdateAgentsProfileRequest extends Request {
+  body: {
+    email: string; // Use email instead of userId
+    firstName?: string;
+    lastName?: string;
+    professionalBackground?: string;
+    descriptions?: string;
+  };
+  file?: Express.Multer.File; // Include the file type for Multer
+}
+router.put('/profileAgent', upload.single('profilePic'), async (req: UpdateAgentsProfileRequest, res: Response) => {
+  const { email, firstName, lastName, professionalBackground, descriptions } = req.body;
+  const profilePic = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : undefined;
+  try {
+    // Find user by email and update the fields
+    const updatedUser = await UserAsAgent.findOneAndUpdate(
+      { email }, // Search by email
+      {
+        firstName,
+        lastName,
+        professionalBackground,
+        descriptions,
         ...(profilePic && { profilePic }), // Only include profilePic if it was uploaded
       },
       { new: true, runValidators: true } // Return the updated document
