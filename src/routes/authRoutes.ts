@@ -53,8 +53,7 @@ interface UpdateUserProfileRequest extends Request {
 // Update user profile with image upload
 router.put('/profile', upload.single('profilePic'), async (req: UpdateUserProfileRequest, res: Response) => {
   const { email, firstName, lastName, achievements, futureGoals } = req.body;
-  const profilePic = req.file ? req.file.path : undefined; // Get the uploaded file path
-
+  const profilePic = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : undefined;
   try {
     // Find user by email and update the fields
     const updatedUser = await User.findOneAndUpdate(
