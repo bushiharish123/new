@@ -22,7 +22,9 @@ export const login = async (req: Request, res: Response) => {
 };
 export const getSports= async(req:Request,res:Response)=>{
   try {
+    console.log("getting the sports list");
     const list = await sportsList(req,res);
+    console.log("getting the sports list",list);
     res.json(list);
   } catch (error:any) {
     res.status(400).json({ error: error.message });

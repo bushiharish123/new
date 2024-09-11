@@ -1,10 +1,14 @@
 // routes/authRoutes.ts
 
 import express from 'express';
+import  { Request, Response } from 'express';
 import { registerValidation, loginValidation, validate } from '../utils/validate';
 import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent, getRecommendedUser, getRecommendedForAgent, ratingForAgent, ratingForAthlet, getAthletRatings, getAgentRatings } from '../controllers/authController';
 import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 import Sport from '../models/Soprts';
+import multer, { StorageEngine } from 'multer';
+import path from 'path';
+import User from '../models/User';
 
 const router = express.Router();
 
@@ -24,6 +28,60 @@ router.get('/getAthletRating',verifyToken,getAthletRatings);
 router.get('/getAgentRating',verifyToken,getAgentRatings)
 
 // router.post('/uploadProfilePic', upload.single('profilePic'), uploadProfilePicture)
+
+const storage: StorageEngine = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory to save uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`); // Add a timestamp to the filename
+  },
+});
+
+
+const upload = multer({ storage });
+interface UpdateUserProfileRequest extends Request {
+  body: {
+    email: string; // Use email instead of userId
+    firstName?: string;
+    lastName?: string;
+    achievements?: string;
+    futureGoals?: string;
+  };
+  file?: Express.Multer.File; // Include the file type for Multer
+}
+// Update user profile with image upload
+router.put('/profile', upload.single('profilePic'), async (req: UpdateUserProfileRequest, res: Response) => {
+  const { email, firstName, lastName, achievements, futureGoals } = req.body;
+  const profilePic = req.file ? req.file.path : undefined; // Get the uploaded file path
+
+  try {
+    // Find user by email and update the fields
+    const updatedUser = await User.findOneAndUpdate(
+      { email }, // Search by email
+      {
+        firstName,
+        lastName,
+        achievements,
+        futureGoals,
+        ...(profilePic && { profilePic }), // Only include profilePic if it was uploaded
+      },
+      { new: true, runValidators: true } // Return the updated document
+    ).select('firstName lastName achievements futureGoals profilePic email age height gender sports school isAthlet');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with the updated fields
+    res.json({
+      message: 'Profile updated successfully',
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating profile', error: (error as Error).message });
+  }
+});
 router.post('/insert-sports', verifyToken, async (req, res) => {
   // Example route to insert sports, protected by the middleware
   const sports = [
