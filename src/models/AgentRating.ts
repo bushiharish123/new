@@ -11,7 +11,7 @@ interface IRating extends Document {
 const RatingSchema: Schema = new Schema({
     userId: { type: String, ref: 'User', required: true }, // Corrected to ObjectId
   agentId: { type: String, ref: 'UserAsAgent', required: true }, // Corrected to ObjectId
-  rating: { type: Number, required: true, min: 1, max: 5 },
+  rating: { type: Number, required: true, min: 1.0, max: 5.0 },
   feedback: { type: String, required: false },
   createdAt: { type: Date, default: Date.now }
   });
