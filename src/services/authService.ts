@@ -279,6 +279,48 @@ export const getEventsOfUsers = async (req: any) => {
 
   return event; // Return the list of users
 };
+export const getProfiles = async (req: any) => {
+  // Extract email from query parameters
+  const { email } = req.query;
+
+  if (!email) {
+    throw new Error('Email parameter is required.');
+  }
+  const userProfile = await User.findOne({ email });
+
+  if (!userProfile) {
+    throw new Error('User not found.');
+  }
+
+  // Create a query to find users whose sports match any of the provided sports
+  
+  
+  // Fetch users who match the query
+
+
+  return userProfile; // Return the list of users
+};
+export const getAgentProfiles = async (req: any) => {
+  // Extract email from query parameters
+  const { email } = req.query;
+
+  if (!email) {
+    throw new Error('Email parameter is required.');
+  }
+  const userProfile = await UserAsAgent.findOne({ email });
+
+  if (!userProfile) {
+    throw new Error('User not found.');
+  }
+
+  // Create a query to find users whose sports match any of the provided sports
+  
+  
+  // Fetch users who match the query
+
+
+  return userProfile; // Return the list of users
+};
 export const getAthletRating=async (req:any,res:any) => {
   const query = {
     userId: req.query.userId, // Use MongoDB's $in operator to match any sport in the sports array

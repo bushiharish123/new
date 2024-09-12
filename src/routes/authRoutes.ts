@@ -3,7 +3,7 @@
 import express from 'express';
 import  { Request, Response } from 'express';
 import { registerValidation, loginValidation, validate } from '../utils/validate';
-import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent, getRecommendedUser, getRecommendedForAgent, ratingForAgent, ratingForAthlet, getAthletRatings, getAgentRatings, setEvent, getUserEvents } from '../controllers/authController';
+import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent, getRecommendedUser, getRecommendedForAgent, ratingForAgent, ratingForAthlet, getAthletRatings, getAgentRatings, setEvent, getUserEvents, getProfile, getAgentProfile } from '../controllers/authController';
 import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 import Sport from '../models/Soprts';
 import multer, { StorageEngine } from 'multer';
@@ -29,7 +29,9 @@ router.get('/recommendations',verifyToken,getRecommendedUser);
 router.get('/recommendationsForAgent',verifyToken,getRecommendedForAgent);
 router.get('/getAthletRating',verifyToken,getAthletRatings);
 router.get('/getAgentRating',verifyToken,getAgentRatings);
-router.get('/getEventsOfUser',verifyToken,getUserEvents)
+router.get('/getEventsOfUser',verifyToken,getUserEvents);
+router.get('/getUserProfile',verifyToken,getProfile)
+router.get('/getAgentProfile',verifyToken,getAgentProfile)
 
 // router.post('/uploadProfilePic', upload.single('profilePic'), uploadProfilePicture)
 

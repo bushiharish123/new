@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers } from '../services/authService';
+import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
 export const register = async (req: Request, res: Response) => {
@@ -106,6 +106,22 @@ export const setEvent = async (req: Request, res: Response) => {
 export const getUserEvents = async(req:Request,res:Response)=>{
   try {
     const users = await getEventsOfUsers(req);
+    res.json(users);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+}
+export const getProfile = async(req:Request,res:Response)=>{
+  try {
+    const users = await getProfiles(req);
+    res.json(users);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+}
+export const getAgentProfile = async(req:Request,res:Response)=>{
+  try {
+    const users = await getAgentProfiles(req);
     res.json(users);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
