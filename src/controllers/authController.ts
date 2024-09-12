@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating } from '../services/authService';
+import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
 export const register = async (req: Request, res: Response) => {
@@ -95,6 +95,22 @@ export const ratingForAthlet = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
+export const setEvent = async (req: Request, res: Response) => {
+  try {
+    const rate = await events(req.body);
+    res.status(200).json({ message: 'Event Created Successfully', rate });
+  } catch (error:any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export const getUserEvents = async(req:Request,res:Response)=>{
+  try {
+    const users = await getEventsOfUsers(req);
+    res.json(users);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+}
 export const logout = (req: Request, res: Response) => {
   const token = req.header('Authorization')?.split(' ')[1];
 

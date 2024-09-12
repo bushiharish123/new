@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import Sport from '../models/Soprts';
 import AgentRating from '../models/AgentRating';
 import AthletRating from '../models/athletRating';
+import EventCreate from '../models/event';
 
 dotenv.config();
 
@@ -46,6 +47,11 @@ interface athletRating {
     rating: number;   
     feedback?: string; 
     createdAt: Date;  
+}
+interface Events {
+  schedulerUser : string;   
+  receiverUser: string;   
+  eventDate: Date;  
 }
 
 export const registerUser = async (userData: RegisterUser) => {
@@ -243,6 +249,35 @@ export const ratingForAthlets=async (rating:athletRating) => {
   await rate.save();
   return ;
 
+};
+
+export const events=async (rating:Events) => {
+  const event = new EventCreate(rating);
+  await event.save();
+  return ;
+};
+export const getEventsOfUsers = async (req: any) => {
+  // Extract email from query parameters
+  const { email } = req.query;
+
+  if (!email) {
+    throw new Error('Email parameter is required.');
+  }
+  const event = await EventCreate.find({
+    $or: [{ schedulerUser: email }, { receiverUser: email }]
+  });
+
+  if (!event) {
+    throw new Error('User not found.');
+  }
+
+  // Create a query to find users whose sports match any of the provided sports
+  
+  
+  // Fetch users who match the query
+
+
+  return event; // Return the list of users
 };
 export const getAthletRating=async (req:any,res:any) => {
   const query = {
