@@ -10,6 +10,7 @@ import multer, { StorageEngine } from 'multer';
 import path from 'path';
 import User from '../models/User';
 import UserAsAgent from '../models/UserAsAgent';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -177,4 +178,25 @@ router.post('/insert-sports', verifyToken, async (req, res) => {
   }
 });
 
+router.get('/user/:id', async (req: Request, res: Response) => {
+  try {
+    // Extract the userId from the request parameters
+    const userIdString = req.params.id;
+
+    // Convert the string userId to ObjectId
+    const userId = new mongoose.Types.ObjectId(userIdString);
+
+    // Fetch the user by _id
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the user
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user', error: (error as Error).message });
+  }
+});
 export default router;

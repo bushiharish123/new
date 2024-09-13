@@ -15,6 +15,8 @@ interface IUser extends Document {
   school?: string;
   sports: string[];
   isAthlet: boolean;
+  avgRating?:number;
+  totalRaters?:number;
   profilePic?: string; // Optional profile picture path
   matchPassword(password: string): Promise<boolean>;
 }
@@ -33,6 +35,8 @@ const UserSchema: Schema<IUser> = new Schema({
   sports: { type: [String], required: true },
   school: { type: String, required: false },
   isAthlet: { type: Boolean, default: false },
+  avgRating:{ type: String, required: false },
+  totalRaters:{ type: String, required: false },
   profilePic: { type: String, required: false }, // Profile picture field
 });
 
