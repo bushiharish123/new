@@ -343,43 +343,43 @@ export const getAgentProfiles = async (req: any) => {
 //   return {ratings,averageRating};
 
 // };
-export const getAthletRating = async (req: Request, res: Response) => {
-  const query = {
-        userId: req.query.userId, // Use MongoDB's $in operator to match any sport in the sports array
-      };
-      const ratings = await AthletRating.find(query)
-      const averageRatingResult = await AthletRating.aggregate([
-        { $match: { userId: req.query.userId } }, // Filter by the agentId
-        {
-          $group: {
-            _id: "$userId", // Group by agentId
-            averageRating: { $avg: "$rating" }, // Calculate the average rating
-            totalRaters: { $sum: 1 }
-          }
-        }
-      ]);
+// export const getAthletRating = async (req: Request, res: Response) => {
+//   const query = {
+//         userId: req.query.userId, // Use MongoDB's $in operator to match any sport in the sports array
+//       };
+//       const ratings = await AthletRating.find(query)
+//       const averageRatingResult = await AthletRating.aggregate([
+//         { $match: { userId: req.query.userId } }, // Filter by the agentId
+//         {
+//           $group: {
+//             _id: "$userId", // Group by agentId
+//             averageRating: { $avg: "$rating" }, // Calculate the average rating
+//             totalRaters: { $sum: 1 }
+//           }
+//         }
+//       ]);
       
-      if (!ratings || ratings.length === 0) {
-        throw new Error('No ratings are there for the athlet');
-      }
-      const { averageRating, totalRaters } = averageRatingResult[0] || { averageRating: 0, totalRaters: 0 };
-      // const updatedUser = await User.findOneAndUpdate(
-      //   { _id: new mongoose.Types.ObjectId(req.query.userId as string)  },
-      //   { avgRating: averageRating, totalRaters: totalRaters },
-      //   { new: true, runValidators: true } // Return the updated document
-      // );
-      // if (!updatedUser) {
-      //   return res.status(404).json({ message: 'User not found' });
-      // }
+//       if (!ratings || ratings.length === 0) {
+//         throw new Error('No ratings are there for the athlet');
+//       }
+//       const { averageRating, totalRaters } = averageRatingResult[0] || { averageRating: 0, totalRaters: 0 };
+//       // const updatedUser = await User.findOneAndUpdate(
+//       //   { _id: new mongoose.Types.ObjectId(req.query.userId as string)  },
+//       //   { avgRating: averageRating, totalRaters: totalRaters },
+//       //   { new: true, runValidators: true } // Return the updated document
+//       // );
+//       // if (!updatedUser) {
+//       //   return res.status(404).json({ message: 'User not found' });
+//       // }
   
-      // Return the ratings and updated average rating
-      res.json({ 
-        message: 'Ratings fetched and user updated successfully',
-        ratings,
-        averageRating,
-        totalRaters 
-      });
-};
+//       // Return the ratings and updated average rating
+//       res.json({ 
+//         message: 'Ratings fetched and user updated successfully',
+//         ratings,
+//         averageRating,
+//         totalRaters 
+//       });
+// };
 
 // export const getAgentRating=async (req:any,res:any) => {
 //   const query = {
@@ -433,6 +433,57 @@ export const getAgentRating = async (req: Request, res: Response) => {
     // Update the User model with the new average rating and total number of raters
     const updatedUser = await UserAsAgent.findOneAndUpdate(
       { _id: agentId },
+      { avgRating: averageRating, totalRaters: totalRaters },
+      { new: true, runValidators: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the ratings and updated average rating
+    res.json({ 
+      message: 'Ratings fetched and user updated successfully',
+      ratings,
+      averageRating,
+      totalRaters 
+    });
+
+  } catch (error) {
+    console.error('Error fetching and updating agent rating:', error);
+    res.status(500).json({ message: 'Error fetching and updating agent rating', error });
+  }
+};
+
+export const getAthletRating = async (req: Request, res: Response) => {
+  try {
+    const userId = req.query.userId as string;
+
+    // Find all ratings for the given agent
+    const ratings = await AthletRating.find({ userId });
+
+    if (!ratings || ratings.length === 0) {
+      return res.status(404).json({ message: 'No ratings are there for the agent' });
+    }
+
+    // Calculate the average rating using MongoDB aggregation
+    const averageRatingResult = await AthletRating.aggregate([
+      { $match: { userId } }, // Filter by agentId
+      {
+        $group: {
+          _id: '$agentId', // Group by agentId
+          averageRating: { $avg: '$rating' }, // Calculate the average rating
+          totalRaters: { $sum: 1 } // Count the total number of raters
+        }
+      }
+    ]);
+
+    // Extract the calculated average rating and total raters
+    const { averageRating, totalRaters } = averageRatingResult[0] || { averageRating: 0, totalRaters: 0 };
+
+    // Update the User model with the new average rating and total number of raters
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
       { avgRating: averageRating, totalRaters: totalRaters },
       { new: true, runValidators: true } // Return the updated document
     );

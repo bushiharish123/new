@@ -199,4 +199,25 @@ router.get('/user/:id', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching user', error: (error as Error).message });
   }
 });
+router.get('/userAgent/:id', async (req: Request, res: Response) => {
+  try {
+    // Extract the userId from the request parameters
+    const userIdString = req.params.id;
+
+    // Convert the string userId to ObjectId
+    const userId = new mongoose.Types.ObjectId(userIdString);
+
+    // Fetch the user by _id
+    const user = await UserAsAgent.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+
+    // Return the user
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user', error: (error as Error).message });
+  }
+});
 export default router;
