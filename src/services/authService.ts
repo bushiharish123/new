@@ -124,7 +124,8 @@ export const searchByNames = async (req: any) => {
     $or: [
       { firstName: { $regex: searchTerm, $options: 'i' } }, // Case-insensitive search in firstName
       { lastName: { $regex: searchTerm, $options: 'i' } },  // Case-insensitive search in lastName
-      { email: { $regex: searchTerm, $options: 'i' } }      // Case-insensitive search in email
+      { email: { $regex: searchTerm, $options: 'i' } },
+      { sports: { $regex: searchTerm, $options: 'i' } }      // Case-insensitive search in email
     ]
   };
 
@@ -153,7 +154,8 @@ export const agentSearches = async (req: any) => {
     $or: [
       { firstName: { $regex: searchTerm, $options: 'i' } }, // Case-insensitive search in firstName
       { lastName: { $regex: searchTerm, $options: 'i' } },  // Case-insensitive search in lastName
-      { email: { $regex: searchTerm, $options: 'i' } }      // Case-insensitive search in email
+      { email: { $regex: searchTerm, $options: 'i' } },
+      { specialization: { $regex: searchTerm, $options: 'i' } }      // Case-insensitive search in email
     ]
   };
 
