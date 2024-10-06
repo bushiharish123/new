@@ -13,8 +13,19 @@ import UserAsAgent from '../models/UserAsAgent';
 import mongoose from 'mongoose';
 
 const router = express.Router();
+const storage: StorageEngine = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory to save uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`); // Add a timestamp to the filename
+  },
+});
 
-router.post('/register', registerValidation, validate, register);
+
+const upload = multer({ storage });
+
+router.post('/register', upload.single('profilePic'),registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
 router.post('/agentRating',verifyToken,ratingForAgent);
 router.post('/athletRating',verifyToken,ratingForAthlet);
@@ -36,17 +47,7 @@ router.get('/getAgentProfile',verifyToken,getAgentProfile)
 
 // router.post('/uploadProfilePic', upload.single('profilePic'), uploadProfilePicture)
 
-const storage: StorageEngine = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory to save uploaded files
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}${path.extname(file.originalname)}`); // Add a timestamp to the filename
-  },
-});
 
-
-const upload = multer({ storage });
 interface UpdateUserProfileRequest extends Request {
   body: {
     email: string; // Use email instead of userId

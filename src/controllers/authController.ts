@@ -2,15 +2,37 @@ import { Request, Response } from 'express';
 import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
+// export const register = async (req: Request, res: Response) => {
+//   try {
+  
+//     const user = req.body.isAthlet ? await registerUser(req.body):await registerUserAsAgent(req.body);
+//     res.status(201).json({ message: 'User registered successfully', user });
+//   } catch (error:any) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
 export const register = async (req: Request, res: Response) => {
   try {
-  
-    const user = req.body.isAthlet ? await registerUser(req.body):await registerUserAsAgent(req.body);
+    // Generate the profilePic URL if a file is uploaded
+    const profilePicUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : undefined;
+
+    // Merge profilePic with req.body
+    const userData = {
+      ...req.body,
+      profilePic: profilePicUrl, // Add the profilePic URL to userData
+    };
+
+    // Register as an athlete or agent depending on `isAthlet`
+    const user = req.body.isAthlet==="true"
+      ? await registerUser(userData)
+      : await registerUserAsAgent(userData);
+
     res.status(201).json({ message: 'User registered successfully', user });
-  } catch (error:any) {
+  } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 export const login = async (req: Request, res: Response) => {
   try {

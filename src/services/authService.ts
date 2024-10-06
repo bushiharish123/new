@@ -24,6 +24,7 @@ interface RegisterUser {
   futureGoals?:string;
   achievements?:string;
   isAthlet?: boolean;
+  profilePic?: any;
 }
 interface registerUserAsAgent {
   firstName: string;
@@ -34,6 +35,7 @@ interface registerUserAsAgent {
   descriptions:string;
   specialization:string
   isAthlet?: boolean;
+  profilePic?: any;
 }
 interface agentRating {
   userId: string;   
@@ -57,6 +59,7 @@ interface Events {
 
 export const registerUser = async (userData: RegisterUser) => {
   // Check if a user already exists with the same firstName and lastName (case-insensitive)
+  console.log("In the register user")
   const existingUser = await User.findOne({
     email: { $regex: new RegExp(`^${userData.email}$`, "i") }
   });
@@ -69,6 +72,8 @@ export const registerUser = async (userData: RegisterUser) => {
   return await user.save();
 };
 export const registerUserAsAgent = async(userData: registerUserAsAgent)=>{
+  console.log("In the register Agent")
+
   const existingUser = await UserAsAgent.findOne({
     email: { $regex: new RegExp(`^${userData.email}$`, "i") }
   });
@@ -242,12 +247,26 @@ export const getRecommendedForAgents = async (req: any) => {
   return users; // Return the list of users
 };
 export const ratingForAgents=async (rating:agentRating) => {
+  const existingRating = await AgentRating.findOne({
+    userId: rating.userId,
+    agentId: rating.agentId
+  });
+  if (existingRating) {
+    throw new Error('User has already rated this agent.');
+  }
   const rate = new AgentRating(rating);
   await rate.save();
   return ;
 
 };
 export const ratingForAthlets=async (rating:athletRating) => {
+  const existingRating = await AthletRating.findOne({
+    userId: rating.userId,
+    agentId: rating.agentId
+  });
+  if (existingRating) {
+    throw new Error('User has already rated this Athlet.');
+  }
   const rate = new AthletRating(rating);
   await rate.save();
   return ;
