@@ -433,7 +433,7 @@ export const getAgentRating = async (req: Request, res: Response) => {
     const ratings = await AgentRating.find({ agentId });
 
     if (!ratings || ratings.length === 0) {
-      return res.status(404).json({ message: 'No ratings are there for the agent' });
+      return []
     }
 
     // Calculate the average rating using MongoDB aggregation
@@ -459,7 +459,7 @@ export const getAgentRating = async (req: Request, res: Response) => {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return [];
     }
 
     // Return the ratings and updated average rating
@@ -484,7 +484,7 @@ export const getAthletRating = async (req: Request, res: Response) => {
     const ratings = await AthletRating.find({ userId });
 
     if (!ratings || ratings.length === 0) {
-      return res.status(404).json({ message: 'No ratings are there for the agent' });
+      return [];
     }
 
     // Calculate the average rating using MongoDB aggregation
@@ -510,7 +510,7 @@ export const getAthletRating = async (req: Request, res: Response) => {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return [];
     }
 
     // Return the ratings and updated average rating
