@@ -433,7 +433,7 @@ export const getAgentRating = async (req: Request, res: Response) => {
     const ratings = await AgentRating.find({ agentId });
 
     if (!ratings || ratings.length === 0) {
-      return []
+      return { message: 'No ratings are there for the agent',ratings};
     }
 
     // Calculate the average rating using MongoDB aggregation
@@ -459,7 +459,7 @@ export const getAgentRating = async (req: Request, res: Response) => {
     );
 
     if (!updatedUser) {
-      return [];
+      return { message: 'User not found' };
     }
 
     // Return the ratings and updated average rating
@@ -484,7 +484,7 @@ export const getAthletRating = async (req: Request, res: Response) => {
     const ratings = await AthletRating.find({ userId });
 
     if (!ratings || ratings.length === 0) {
-      return [];
+      return { message: 'No ratings are there for the Athlet', ratings };
     }
 
     // Calculate the average rating using MongoDB aggregation
@@ -510,7 +510,7 @@ export const getAthletRating = async (req: Request, res: Response) => {
     );
 
     if (!updatedUser) {
-      return [];
+      return { message: 'User not found' };
     }
 
     // Return the ratings and updated average rating
@@ -523,6 +523,9 @@ export const getAthletRating = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error('Error fetching and updating agent rating:', error);
-    res.status(500).json({ message: 'Error fetching and updating agent rating', error });
+    // res.status(500).json({ message: 'Error fetching and updating agent rating', error });
+    if (!res.headersSent) {
+      return res.status(500).json({ message: 'Error fetching and updating agent rating', error });
+    }
   }
 };
