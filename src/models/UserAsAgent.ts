@@ -13,6 +13,9 @@ interface IuserAsAgent extends Document {
     totalRaters?:number;
     profilePic?: string;
     isAthlet?: boolean;
+    dob?:string;
+    location?:string;
+    certificate?:string;
   matchPassword(password: string): Promise<boolean>;
 }
 
@@ -27,7 +30,10 @@ const UserAsAgentSchema: Schema = new Schema({
   avgRating:{ type: String, required: false },
   totalRaters:{ type: String, required: false },
   isAthlet: { type: Boolean, default: false },
-  profilePic: { type: String, required: false }
+  profilePic: { type: String, required: false },
+  dob:{type:String,required:false},
+  location:{type:String,required:false},
+  certificate:{type:String,required:false}
 });
 
 UserAsAgentSchema.pre<IuserAsAgent>('save', async function (next) {

@@ -11,19 +11,47 @@ import ProfilePicture from '../models/ProfilePicture';
 //     res.status(400).json({ error: error.message });
 //   }
 // };
+// export const register = async (req: Request, res: Response) => {
+//   try {
+//     // Generate the profilePic URL if a file is uploaded
+//     const profilePicUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : undefined;
+//     const certificate = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : undefined;
+
+
+//     // Merge profilePic with req.body
+//     const userData = {
+//       ...req.body,
+//       profilePic: profilePicUrl, // Add the profilePic URL to userData
+//     };
+
+//     // Register as an athlete or agent depending on `isAthlet`
+//     const user = req.body.isAthlet==="true"
+//       ? await registerUser(userData)
+//       : await registerUserAsAgent(userData);
+
+//     res.status(201).json({ message: 'User registered successfully', user });
+//   } catch (error: any) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
 export const register = async (req: Request, res: Response) => {
   try {
-    // Generate the profilePic URL if a file is uploaded
-    const profilePicUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : undefined;
+    // Retrieve uploaded files
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    
+    // Generate the URLs for profilePic and certificate if files are uploaded
+    const profilePicUrl = files?.profilePic ? `${req.protocol}://${req.get('host')}/uploads/${files.profilePic[0].filename}` : undefined;
+    const certificateUrl = files?.certificate ? `${req.protocol}://${req.get('host')}/uploads/${files.certificate[0].filename}` : undefined;
 
-    // Merge profilePic with req.body
+    // Merge the URLs with req.body
     const userData = {
       ...req.body,
       profilePic: profilePicUrl, // Add the profilePic URL to userData
+      certificate: certificateUrl, // Add the certificate URL to userData
     };
 
     // Register as an athlete or agent depending on `isAthlet`
-    const user = req.body.isAthlet==="true"
+    const user = req.body.isAthlet === "true"
       ? await registerUser(userData)
       : await registerUserAsAgent(userData);
 
@@ -32,6 +60,7 @@ export const register = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 export const login = async (req: Request, res: Response) => {

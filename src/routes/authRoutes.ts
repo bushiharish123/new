@@ -25,7 +25,17 @@ const storage: StorageEngine = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post('/register', upload.single('profilePic'),registerValidation, validate, register);
+// router.post('/register', upload.single('profilePic'),upload.single('certificate'),registerValidation, validate, register);
+router.post('/register', 
+  upload.fields([
+    { name: 'profilePic', maxCount: 1 }, 
+    { name: 'certificate', maxCount: 1 }
+  ]), 
+  registerValidation, 
+  validate, 
+  register
+);
+
 router.post('/login', loginValidation, validate, login);
 router.post('/agentRating',verifyToken,ratingForAgent);
 router.post('/athletRating',verifyToken,ratingForAthlet);

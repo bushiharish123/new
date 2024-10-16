@@ -18,6 +18,9 @@ interface IUser extends Document {
   avgRating?:number;
   totalRaters?:number;
   profilePic?: string; // Optional profile picture path
+  dob?:string;
+  location?:string;
+  certificate?:string;
   matchPassword(password: string): Promise<boolean>;
 }
 
@@ -38,6 +41,9 @@ const UserSchema: Schema<IUser> = new Schema({
   avgRating:{ type: String, required: false },
   totalRaters:{ type: String, required: false },
   profilePic: { type: String, required: false }, // Profile picture field
+  dob:{type:String,required:false},
+  location:{type:String,required:false},
+  certificate:{type:String,required:false}
 });
 
 // Pre-save middleware to hash the password before saving
