@@ -21,6 +21,8 @@ interface IUser extends Document {
   dob?:string;
   location?:string;
   certificate?:string;
+  yoe?:string;
+  position?:string;
   matchPassword(password: string): Promise<boolean>;
 }
 
@@ -43,7 +45,9 @@ const UserSchema: Schema<IUser> = new Schema({
   profilePic: { type: String, required: false }, // Profile picture field
   dob:{type:String,required:false},
   location:{type:String,required:false},
-  certificate:{type:String,required:false}
+  certificate:{type:String,required:false},
+  yoe:{type:String,required:false},
+  position:{type:String,required:false}
 });
 
 // Pre-save middleware to hash the password before saving

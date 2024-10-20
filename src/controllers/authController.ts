@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles } from '../services/authService';
+import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles, delEvents } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
 // export const register = async (req: Request, res: Response) => {
@@ -152,6 +152,16 @@ export const setEvent = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Event Created Successfully', rate });
   } catch (error:any) {
     res.status(400).json({ error: error.message });
+  }
+};
+export const delEvent =async (req:Request,res:Response)=>{
+  try{
+const delResponse = await delEvents(req);
+console.log(delResponse);
+res.status(200).json({message:'Event Cancelled Successfully'})
+  }
+  catch(error:any){
+    res.status(400).json({error:error.message});
   }
 };
 export const getUserEvents = async(req:Request,res:Response)=>{

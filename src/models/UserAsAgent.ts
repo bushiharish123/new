@@ -16,6 +16,8 @@ interface IuserAsAgent extends Document {
     dob?:string;
     location?:string;
     certificate?:string;
+    yoe?:string;
+    position?:string;
   matchPassword(password: string): Promise<boolean>;
 }
 
@@ -33,7 +35,9 @@ const UserAsAgentSchema: Schema = new Schema({
   profilePic: { type: String, required: false },
   dob:{type:String,required:false},
   location:{type:String,required:false},
-  certificate:{type:String,required:false}
+  certificate:{type:String,required:false},
+  yoe:{type:String,required:false},
+  position:{type:String,required:false}
 });
 
 UserAsAgentSchema.pre<IuserAsAgent>('save', async function (next) {

@@ -8,7 +8,7 @@ import Sport from '../models/Soprts';
 import AgentRating from '../models/AgentRating';
 import AthletRating from '../models/athletRating';
 import EventCreate from '../models/event';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 dotenv.config();
 
@@ -278,6 +278,31 @@ export const events=async (rating:Events) => {
   await event.save();
   return ;
 };
+export const delEvents = async (req: any) => {
+  const id = req.query.id;
+
+  if (!id) {
+    throw new Error('Id parameter is required.');
+  }
+
+  // Check if the id is a valid MongoDB ObjectId
+  if (!Types.ObjectId.isValid(id)) {
+    throw new Error('Invalid event ID format.');
+  }
+
+  try {
+    // Find and delete the event by its _id
+    const result = await EventCreate.findByIdAndDelete(id);
+    if (result) {
+      return 'Cancelled Successfully';
+    } else {
+      throw new Error('Event ID not found.');
+    }
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    throw error; // Rethrow the error to be caught by the controller
+  }
+};
 export const getEventsOfUsers = async (req: any) => {
   // Extract email from query parameters
   const { email } = req.query;
@@ -285,9 +310,12 @@ export const getEventsOfUsers = async (req: any) => {
   if (!email) {
     throw new Error('Email parameter is required.');
   }
+  // const event = await EventCreate.find({
+  //   $or: [{ schedulerUser: email }, { receiverUser: email }]
+  // });
   const event = await EventCreate.find({
     $or: [{ schedulerUser: email }, { receiverUser: email }]
-  });
+  }).sort({ eventDate: -1 });
 
   if (!event) {
     throw new Error('User not found.');
