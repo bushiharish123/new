@@ -303,6 +303,37 @@ export const delEvents = async (req: any) => {
     throw error; // Rethrow the error to be caught by the controller
   }
 };
+export const reScheduleEvents=async (req:any) => {
+  // const event = new EventCreate(rating);
+  // await event.save();
+  
+  const title = req.body.title;
+  const id = req.body.id;
+  const eventDate = req.body.eventDate;
+  if (!Types.ObjectId.isValid(id)) {
+    throw new Error('Invalid event ID format.');
+  }
+
+  try {
+    // Find and delete the event by its _id
+    const updatedUser = await EventCreate.findOneAndUpdate(
+      { _id: id },
+      { title: title, eventDate: eventDate },
+      { new: true, runValidators: true } // Return the updated document
+    );
+  
+    if (!updatedUser) {
+      return { message: 'Event not found' };
+    }else{
+      return { message: 'Event Rescheduled Successfully' };
+    }
+  } catch (error) {
+    console.error('Error rescheduling event:', error);
+    throw error; // Rethrow the error to be caught by the controller
+  }
+  
+
+};
 export const getEventsOfUsers = async (req: any) => {
   // Extract email from query parameters
   const { email } = req.query;
