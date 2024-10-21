@@ -9,6 +9,8 @@ import AgentRating from '../models/AgentRating';
 import AthletRating from '../models/athletRating';
 import EventCreate from '../models/event';
 import mongoose, { Types } from 'mongoose';
+// import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -87,12 +89,73 @@ export const registerUserAsAgent = async(userData: registerUserAsAgent)=>{
 }
 
 
-export const loginUser = async (email: string, password: string,isAthlet:boolean) => {
-  const user = isAthlet?await User.findOne({ email }):await UserAsAgent.findOne({ email });
+// export const loginUser = async (email: string, password: string,isAthlet:boolean) => {
+//   const user = isAthlet?await User.findOne({ email }):await UserAsAgent.findOne({ email });
+//   if (!user) throw new Error('Invalid credentials');
+
+//   const isMatch = await user.matchPassword(password);
+//   if (!isMatch) throw new Error('Invalid credentials');
+
+//   // Generate JWT token
+//   const token = jwt.sign(
+//     { id: user._id, isAthlet: user.isAthlet },
+//     process.env.JWT_SECRET!,
+//     { expiresIn: '1h' }
+//   );
+
+//   return { token, userDetails: user };
+// };
+
+
+export const loginUser = async (email: string, password: string, isAthlet: boolean) => {
+  const user = isAthlet ? await User.findOne({ email }) : await UserAsAgent.findOne({ email });
   if (!user) throw new Error('Invalid credentials');
 
   const isMatch = await user.matchPassword(password);
   if (!isMatch) throw new Error('Invalid credentials');
+
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit OTP
+
+  // Store the OTP in the user record or another database temporarily
+  user.otp = otp;
+  user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);; // OTP expires in 10 minutes
+  await user.save();
+
+  // Send OTP via email
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', // or any other email service
+    auth: {
+      user: process.env.EMAIL_USER, // your email
+      pass: process.env.EMAIL_PASS, // your email password
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: user.email,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is ${otp}`,
+  };
+
+  await transporter.sendMail(mailOptions);
+
+  return { message: 'OTP sent to your email' };
+};
+
+export const validateOtp = async (email: string, otp: number) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error('Invalid email');
+
+  if (user.otp !== otp) throw new Error('Invalid OTP');
+  // if (user.otpExpiry < Date.now()) throw new Error('OTP has expired');
+  if (!user.otpExpiry || user.otpExpiry.getTime() < Date.now()) {
+    throw new Error('OTP has expired');
+  }
+  // Clear the OTP and expiry after validation
+  user.otp = undefined;
+  user.otpExpiry = undefined;
+  await user.save();
 
   // Generate JWT token
   const token = jwt.sign(

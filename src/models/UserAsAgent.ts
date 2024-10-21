@@ -20,6 +20,8 @@ interface IuserAsAgent extends Document {
     certificateName?:string;
     yoe?:string;
     position?:string;
+    otp?:number;
+    otpExpiry?:Date;
   matchPassword(password: string): Promise<boolean>;
 }
 
@@ -41,7 +43,9 @@ const UserAsAgentSchema: Schema = new Schema({
   certificateName:{type:String,required:false},
   stats:{type:String,required:false},
   yoe:{type:String,required:false},
-  position:{type:String,required:false}
+  position:{type:String,required:false},
+  otp:{type:Number,required:false},
+  otpExpiry:{type: Date, default: Date.now}
 });
 
 UserAsAgentSchema.pre<IuserAsAgent>('save', async function (next) {

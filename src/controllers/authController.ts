@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles, delEvents, reScheduleEvents } from '../services/authService';
+import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles, delEvents, reScheduleEvents, validateOtp } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
 // export const register = async (req: Request, res: Response) => {
@@ -65,10 +65,19 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { token, userDetails } = await loginUser(req.body.email, req.body.password,req.body.isAthlet);
-    res.json({ token, userDetails });
+    const resp = await loginUser(req.body.email, req.body.password,req.body.isAthlet);
+    res.json( resp );
   } catch (error:any) {
     res.status(400).json({ error: error.message });
+  }
+};
+export const validateOTP = async (req:any, res:any) => {
+  try {
+    const { email, otp } = req.body;
+    const response = await validateOtp(email, otp);
+    res.json(response);
+  } catch (err:any) {
+    res.status(400).json({ error: err.message });
   }
 };
 export const getSports= async(req:Request,res:Response)=>{
