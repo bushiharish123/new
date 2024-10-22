@@ -143,8 +143,8 @@ export const loginUser = async (email: string, password: string, isAthlet: boole
   return { message: 'OTP sent to your email' };
 };
 
-export const validateOtp = async (email: string, otp: number) => {
-  const user = await User.findOne({ email });
+export const validateOtp = async (email: string, otp: number,isAthlet:boolean) => {
+  const user = isAthlet?await User.findOne({ email }):await UserAsAgent.findOne({ email });
   if (!user) throw new Error('Invalid email');
 
   if (user.otp !== otp) throw new Error('Invalid OTP');

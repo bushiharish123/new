@@ -73,8 +73,8 @@ export const login = async (req: Request, res: Response) => {
 };
 export const validateOTP = async (req:any, res:any) => {
   try {
-    const { email, otp } = req.body;
-    const response = await validateOtp(email, otp);
+    const { email, otp,isAthlet } = req.body;
+    const response = await validateOtp(email, otp,isAthlet);
     res.json(response);
   } catch (err:any) {
     res.status(400).json({ error: err.message });
