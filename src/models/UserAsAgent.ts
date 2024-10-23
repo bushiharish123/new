@@ -18,7 +18,7 @@ interface IuserAsAgent extends Document {
     certificate?:string;
     stats?:string;
     certificateName?:string;
-    yoe?:string;
+    yoe?:number;
     position?:string;
     otp?:number;
     otpExpiry?:Date;
@@ -42,7 +42,7 @@ const UserAsAgentSchema: Schema = new Schema({
   certificate:{type:String,required:false},
   certificateName:{type:String,required:false},
   stats:{type:String,required:false},
-  yoe:{type:String,required:false},
+  yoe:{type:Number,required:false},
   position:{type:String,required:false},
   otp:{type:Number,required:false},
   otpExpiry:{type: Date, default: Date.now}
