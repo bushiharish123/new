@@ -27,6 +27,7 @@ interface IUser extends Document {
   position?:string;
   otp?:number;
   otpExpiry?:Date;
+  listOfSubscribers?:string[];
   matchPassword(password: string): Promise<boolean>;
 }
 
@@ -55,6 +56,7 @@ const UserSchema: Schema<IUser> = new Schema({
   yoe:{type:Number,required:false},
   position:{type:String,required:false},
   otp:{type:Number,required:false},
+  listOfSubscribers:{type:[String],require:false},
   otpExpiry:{type: Date, default: Date.now},
 });
 

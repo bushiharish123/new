@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles, delEvents, reScheduleEvents, validateOtp } from '../services/authService';
+import { registerUser, loginUser, sportsList, searchByNames, registerUserAsAgent, agentSearches, getRecommendedUsers, getRecommendedForAgents, ratingForAgents, ratingForAthlets, getAthletRating, getAgentRating, events, getEventsOfUsers, getProfiles, getAgentProfiles, delEvents, reScheduleEvents, validateOtp, subscribeUsers } from '../services/authService';
 import { blacklist } from '../middleware/authMiddleware';
 import ProfilePicture from '../models/ProfilePicture';
+import { subscribe } from 'diagnostics_channel';
+import User from '../models/User';
 // export const register = async (req: Request, res: Response) => {
 //   try {
   
@@ -163,6 +165,16 @@ export const setEvent = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
+export const subscribeUser = async(req:any,res:any)=>{
+try{
+  const statusOfActivity = await subscribeUsers(req);
+  res.status(200).json({message:'subscribed Successfully',user:statusOfActivity});
+  
+}catch(error:any){
+res.status(400).json({error:error.message})
+}
+}
+
 export const delEvent =async (req:Request,res:Response)=>{
   try{
 const delResponse = await delEvents(req);

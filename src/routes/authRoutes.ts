@@ -3,7 +3,7 @@
 import express from 'express';
 import  { Request, Response } from 'express';
 import { registerValidation, loginValidation, validate } from '../utils/validate';
-import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent, getRecommendedUser, getRecommendedForAgent, ratingForAgent, ratingForAthlet, getAthletRatings, getAgentRatings, setEvent, getUserEvents, getProfile, getAgentProfile, delEvent, rescheduleEvent, validateOTP } from '../controllers/authController';
+import { register, login, getSports, searchByName, logout, uploadProfilePicture, searchByNameForAgent, getRecommendedUser, getRecommendedForAgent, ratingForAgent, ratingForAthlet, getAthletRatings, getAgentRatings, setEvent, getUserEvents, getProfile, getAgentProfile, delEvent, rescheduleEvent, validateOTP, subscribeUser } from '../controllers/authController';
 import { verifyToken } from '../middleware/authMiddleware'; // Import the middleware
 import Sport from '../models/Soprts';
 import multer, { StorageEngine } from 'multer';
@@ -11,6 +11,7 @@ import path from 'path';
 import User from '../models/User';
 import UserAsAgent from '../models/UserAsAgent';
 import mongoose from 'mongoose';
+import { subscribe } from 'diagnostics_channel';
 
 const router = express.Router();
 const storage: StorageEngine = multer.diskStorage({
@@ -42,7 +43,8 @@ router.post('/athletRating',verifyToken,ratingForAthlet);
 router.post('/setEvent',verifyToken,setEvent);
 router.delete('/cancelEvent',verifyToken,delEvent);
 router.put('/rescheduleEvent',verifyToken,rescheduleEvent);
-router.post('/validate-otp',validateOTP)
+router.post('/validate-otp',validateOTP);
+router.post('/subscribe',verifyToken,subscribeUser);
 // Apply the `verifyToken` middleware to protect these routes
 router.get('/sports', getSports);
 router.get('/athletSearch', verifyToken, searchByName);
