@@ -56,7 +56,8 @@ interface athletRating {
 interface Events {
   schedulerUser : string;   
   receiverUser: string;   
-  eventDate: Date;  
+  eventDate: Date;
+  title ?:string;
 }
 
 export const registerUser = async (userData: RegisterUser) => {
@@ -339,6 +340,29 @@ export const ratingForAthlets=async (rating:athletRating) => {
 export const events=async (rating:Events) => {
   const event = new EventCreate(rating);
   await event.save();
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', // or any other email service
+    auth: {
+      user: process.env.EMAIL_USER, // your email
+      pass: process.env.EMAIL_PASS, // your email password
+    },
+  });
+
+  const mailToSender = {
+    from: process.env.EMAIL_USER,
+    to: rating.schedulerUser,
+    subject: 'Schedule the Event',
+    text: `You have Scheduled the meet with the user having email Id ${rating.receiverUser}, having title ${rating.title}`,
+  };
+  const mailToReceiver = {
+    from: process.env.EMAIL_USER,
+    to: rating.receiverUser,
+    subject: 'Schedule the Event',
+    text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with You, having title ${rating.title} `,
+  };
+
+  await transporter.sendMail(mailToSender);
+  await transporter.sendMail(mailToReceiver);
   return ;
 };
 export const subscribeUsers =async (req:any)=>{
