@@ -11,6 +11,10 @@ import EventCreate from '../models/event';
 import mongoose, { Types } from 'mongoose';
 // import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import { google, calendar_v3 } from 'googleapis';
+import fs from 'fs';
+import path from 'path';
+import { OAuth2Client } from 'google-auth-library';
 
 dotenv.config();
 
@@ -337,34 +341,34 @@ export const ratingForAthlets=async (rating:athletRating) => {
 
 };
 
-export const events=async (rating:Events) => {
-  const event = new EventCreate(rating);
-  await event.save();
-  const transporter = nodemailer.createTransport({
-    service: 'gmail', // or any other email service
-    auth: {
-      user: process.env.EMAIL_USER, // your email
-      pass: process.env.EMAIL_PASS, // your email password
-    },
-  });
+// export const events=async (rating:Events) => {
+//   const event = new EventCreate(rating);
+//   await event.save();
+//   const transporter = nodemailer.createTransport({
+//     service: 'gmail', // or any other email service
+//     auth: {
+//       user: process.env.EMAIL_USER, // your email
+//       pass: process.env.EMAIL_PASS, // your email password
+//     },
+//   });
 
-  const mailToSender = {
-    from: process.env.EMAIL_USER,
-    to: rating.schedulerUser,
-    subject: 'Schedule the Event',
-    text: `You have Scheduled the meet with the user having email Id ${rating.receiverUser}, having title ${rating.title}`,
-  };
-  const mailToReceiver = {
-    from: process.env.EMAIL_USER,
-    to: rating.receiverUser,
-    subject: 'Schedule the Event',
-    text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with You, having title ${rating.title} `,
-  };
+//   const mailToSender = {
+//     from: process.env.EMAIL_USER,
+//     to: rating.schedulerUser,
+//     subject: 'Schedule the Event',
+//     text: `You have Scheduled the meet with the user having email Id ${rating.receiverUser}, having title ${rating.title}`,
+//   };
+//   const mailToReceiver = {
+//     from: process.env.EMAIL_USER,
+//     to: rating.receiverUser,
+//     subject: 'Schedule the Event',
+//     text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with You, having title ${rating.title} `,
+//   };
 
-  await transporter.sendMail(mailToSender);
-  await transporter.sendMail(mailToReceiver);
-  return ;
-};
+//   await transporter.sendMail(mailToSender);
+//   await transporter.sendMail(mailToReceiver);
+//   return ;
+// };
 export const subscribeUsers =async (req:any)=>{
   const {subscriberId,subscribeeId}=req.body;
   try{
@@ -688,4 +692,123 @@ export const getAthletRating = async (req: Request, res: Response) => {
       return res.status(500).json({ message: 'Error fetching and updating agent rating', error });
     }
   }
+};
+async function authorizeOAuth2(): Promise<OAuth2Client> {
+  const { HARISH_IDD, HARISH_ID, REDIRECT } = process.env;
+
+  const oAuth2Client = new google.auth.OAuth2(
+    HARISH_IDD,
+    HARISH_ID,
+    REDIRECT
+  );
+
+  // Optionally, you can set the refresh token if you have one
+  // oAuth2Client.setCredentials({ refresh_token: 'YOUR_REFRESH_TOKEN' });
+
+  return oAuth2Client;
+}
+
+// Create a Google Calendar event using OAuth2
+async function createGoogleCalendarEvent(auth: OAuth2Client, rating: Events): Promise<void> {
+  const calendar = google.calendar({ version: 'v3', auth });
+
+  const event: calendar_v3.Schema$Event = {
+    summary: `Meeting: ${rating.title}`,
+    description: `Scheduled meet with ${rating.receiverUser}.`,
+    start: {
+      dateTime: new Date(rating.eventDate).toISOString(),
+      timeZone: 'Asia/Kolkata',
+    },
+    end: {
+      dateTime: new Date(new Date(rating.eventDate).getTime() + 30 * 60 * 1000).toISOString(), // 30 mins duration
+      timeZone: 'Asia/Kolkata',
+    },
+    attendees: [{ email: rating.receiverUser }],
+  };
+
+  try {
+    const response = await calendar.events.insert({
+      calendarId: 'primary',
+      requestBody: event, // Changed `resource` to `requestBody` for TypeScript compatibility
+    });
+    console.log(`Event created: ${response.data?.htmlLink}`);
+  } catch (error) {
+    console.error('Error creating calendar event:', error);
+  }
+}
+
+// Generate the Google Calendar event link
+function generateGoogleCalendarLink(rating: Events,flag:boolean): string {
+  // const startDateTime = new Date(rating.eventDate).toISOString();
+  // const endDateTime = new Date(new Date(rating.eventDate).getTime() + 30 * 60 * 1000).toISOString(); // 30 mins duration
+  // const eventSummary = encodeURIComponent(`Meeting: ${rating.title}`);
+  // const eventDescription = encodeURIComponent(`Scheduled meet with ${rating.receiverUser}.`);
+  // console.log("startDateTime",startDateTime);
+  // console.log("endDateTime",endDateTime);
+  // return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventSummary}&dates=${startDateTime}/${endDateTime}&details=${eventDescription}&attendees=${encodeURIComponent(rating.receiverUser)}`;
+  const startDateTime = new Date(rating.eventDate);
+  const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000); // 30 mins duration
+
+  // Format date to 'YYYYMMDDTHHMMSS' (local time without 'Z')
+  const formatDateTime = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}${month}${day}T${hours}${minutes}`;
+  };
+
+  // Use local time (Asia/Kolkata)
+  const formattedStartDateTime = formatDateTime(startDateTime);
+  const formattedEndDateTime = formatDateTime(endDateTime);
+
+  const eventSummary = encodeURIComponent(`Meeting: ${rating.title}`);
+  const eventDescription =flag? encodeURIComponent(`Scheduled meet with ${rating.schedulerUser}.`):encodeURIComponent(`Scheduled meet with ${rating.receiverUser}.`);
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventSummary}&dates=${formattedStartDateTime}/${formattedEndDateTime}&details=${eventDescription}&attendees=${encodeURIComponent(flag?rating.schedulerUser:rating.receiverUser)}`;
+
+}
+
+// Send email and add a calendar event using OAuth2
+export const events = async (rating: Events) => {
+  // Configure nodemailer for email
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  // Generate Google Calendar link
+  const googleCalendarLink = generateGoogleCalendarLink(rating,false);
+  const googleCalendarLinkSender = generateGoogleCalendarLink(rating,true);
+  console.log(googleCalendarLink.toString())
+  console.log(googleCalendarLinkSender.toString())
+
+  // Email details for scheduler
+  const mailToSender = {
+    from: process.env.EMAIL_USER,
+    to: rating.schedulerUser,
+    subject: `Schedule the Event on ${rating.eventDate}`,
+    text: `You have scheduled a meet with ${rating.receiverUser}, title: ${rating.title}, scheduled on ${rating.eventDate}. \n\nAdd to your Google Calendar: ${googleCalendarLink}`,
+  };
+
+  // Email details for receiver
+  const mailToReceiver = {
+    from: process.env.EMAIL_USER,
+    to: rating.receiverUser,
+    subject: 'Schedule the Event',
+    text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with you, having title ${rating.title}, scheduled on ${rating.eventDate}. \n\nAdd to your Google Calendar: ${googleCalendarLinkSender}`,
+  };
+
+  // Send emails
+  await transporter.sendMail(mailToSender);
+  await transporter.sendMail(mailToReceiver);
+  console.log('Emails sent successfully');
+
+  // Authorize with OAuth2 and create a calendar event
+  const auth = await authorizeOAuth2();
+  await createGoogleCalendarEvent(auth, rating);
 };
