@@ -368,9 +368,9 @@ export const events=async (rating:Events) => {
 export const subscribeUsers =async (req:any)=>{
   const {subscriberId,subscribeeId}=req.body;
   try{
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: subscriberId },
-      { $addToSet: { listOfSubscribers: subscribeeId } }, // Only add if not already present
+    const updatedUser = await UserAsAgent.findOneAndUpdate(
+      { _id: subscribeeId },
+      { $addToSet: { listOfSubscribers: subscriberId } }, // Only add if not already present
       { new: true, runValidators: true } // Return the updated document with validation
     );
     return updatedUser;
