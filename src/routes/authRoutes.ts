@@ -40,7 +40,7 @@ router.post('/register',
 router.post('/login', loginValidation, validate, login);
 router.post('/agentRating',verifyToken,ratingForAgent);
 router.post('/athletRating',verifyToken,ratingForAthlet);
-router.post('/setEvent',verifyToken,setEvent);
+router.post('/setEvent',setEvent);
 router.delete('/cancelEvent',verifyToken,delEvent);
 router.put('/rescheduleEvent',verifyToken,rescheduleEvent);
 router.post('/validate-otp',validateOTP);
