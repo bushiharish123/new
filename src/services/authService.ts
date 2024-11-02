@@ -341,34 +341,34 @@ export const ratingForAthlets=async (rating:athletRating) => {
 
 };
 
-// export const events=async (rating:Events) => {
-//   const event = new EventCreate(rating);
-//   await event.save();
-//   const transporter = nodemailer.createTransport({
-//     service: 'gmail', // or any other email service
-//     auth: {
-//       user: process.env.EMAIL_USER, // your email
-//       pass: process.env.EMAIL_PASS, // your email password
-//     },
-//   });
+export const events=async (rating:Events) => {
+  const event = new EventCreate(rating);
+  await event.save();
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', // or any other email service
+    auth: {
+      user: process.env.EMAIL_USER, // your email
+      pass: process.env.EMAIL_PASS, // your email password
+    },
+  });
 
-//   const mailToSender = {
-//     from: process.env.EMAIL_USER,
-//     to: rating.schedulerUser,
-//     subject: 'Schedule the Event',
-//     text: `You have Scheduled the meet with the user having email Id ${rating.receiverUser}, having title ${rating.title}`,
-//   };
-//   const mailToReceiver = {
-//     from: process.env.EMAIL_USER,
-//     to: rating.receiverUser,
-//     subject: 'Schedule the Event',
-//     text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with You, having title ${rating.title} `,
-//   };
+  const mailToSender = {
+    from: process.env.EMAIL_USER,
+    to: rating.schedulerUser,
+    subject: 'Schedule the Event',
+    text: `You have Scheduled the meet with the user having email Id ${rating.receiverUser}, having title ${rating.title}`,
+  };
+  const mailToReceiver = {
+    from: process.env.EMAIL_USER,
+    to: rating.receiverUser,
+    subject: 'Schedule the Event',
+    text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with You, having title ${rating.title} `,
+  };
 
-//   await transporter.sendMail(mailToSender);
-//   await transporter.sendMail(mailToReceiver);
-//   return ;
-// };
+  await transporter.sendMail(mailToSender);
+  await transporter.sendMail(mailToReceiver);
+  return ;
+};
 export const subscribeUsers =async (req:any)=>{
   const {subscriberId,subscribeeId}=req.body;
   try{
@@ -771,44 +771,44 @@ function generateGoogleCalendarLink(rating: Events,flag:boolean): string {
 }
 
 // Send email and add a calendar event using OAuth2
-export const events = async (rating: Events) => {
-  // Configure nodemailer for email
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+// export const events = async (rating: Events) => {
+//   // Configure nodemailer for email
+//   const transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS,
+//     },
+//   });
 
-  // Generate Google Calendar link
-  const googleCalendarLink = generateGoogleCalendarLink(rating,false);
-  const googleCalendarLinkSender = generateGoogleCalendarLink(rating,true);
-  console.log(googleCalendarLink.toString())
-  console.log(googleCalendarLinkSender.toString())
+//   // Generate Google Calendar link
+//   const googleCalendarLink = generateGoogleCalendarLink(rating,false);
+//   const googleCalendarLinkSender = generateGoogleCalendarLink(rating,true);
+//   console.log(googleCalendarLink.toString())
+//   console.log(googleCalendarLinkSender.toString())
 
-  // Email details for scheduler
-  const mailToSender = {
-    from: process.env.EMAIL_USER,
-    to: rating.schedulerUser,
-    subject: `Schedule the Event on ${rating.eventDate}`,
-    text: `You have scheduled a meet with ${rating.receiverUser}, title: ${rating.title}, scheduled on ${rating.eventDate}. \n\nAdd to your Google Calendar: ${googleCalendarLink}`,
-  };
+//   // Email details for scheduler
+//   const mailToSender = {
+//     from: process.env.EMAIL_USER,
+//     to: rating.schedulerUser,
+//     subject: `Schedule the Event on ${rating.eventDate}`,
+//     text: `You have scheduled a meet with ${rating.receiverUser}, title: ${rating.title}, scheduled on ${rating.eventDate}. \n\nAdd to your Google Calendar: ${googleCalendarLink}`,
+//   };
 
-  // Email details for receiver
-  const mailToReceiver = {
-    from: process.env.EMAIL_USER,
-    to: rating.receiverUser,
-    subject: 'Schedule the Event',
-    text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with you, having title ${rating.title}, scheduled on ${rating.eventDate}. \n\nAdd to your Google Calendar: ${googleCalendarLinkSender}`,
-  };
+//   // Email details for receiver
+//   const mailToReceiver = {
+//     from: process.env.EMAIL_USER,
+//     to: rating.receiverUser,
+//     subject: 'Schedule the Event',
+//     text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with you, having title ${rating.title}, scheduled on ${rating.eventDate}. \n\nAdd to your Google Calendar: ${googleCalendarLinkSender}`,
+//   };
 
-  // Send emails
-  await transporter.sendMail(mailToSender);
-  await transporter.sendMail(mailToReceiver);
-  console.log('Emails sent successfully');
+//   // Send emails
+//   await transporter.sendMail(mailToSender);
+//   await transporter.sendMail(mailToReceiver);
+//   console.log('Emails sent successfully');
 
-  // Authorize with OAuth2 and create a calendar event
-  const auth = await authorizeOAuth2();
-  await createGoogleCalendarEvent(auth, rating);
-};
+//   // Authorize with OAuth2 and create a calendar event
+//   const auth = await authorizeOAuth2();
+//   await createGoogleCalendarEvent(auth, rating);
+// };
