@@ -323,34 +323,6 @@ export const ratingForAthlets=async (rating:athletRating) => {
 
 };
 
-// export const events=async (rating:Events) => {
-//   const event = new EventCreate(rating);
-//   await event.save();
-//   const transporter = nodemailer.createTransport({
-//     service: 'gmail', // or any other email service
-//     auth: {
-//       user: process.env.EMAIL_USER, // your email
-//       pass: process.env.EMAIL_PASS, // your email password
-//     },
-//   });
-
-//   const mailToSender = {
-//     from: process.env.EMAIL_USER,
-//     to: rating.schedulerUser,
-//     subject: 'Schedule the Event',
-//     text: `You have Scheduled the meet with the user having email Id ${rating.receiverUser}, having title ${rating.title}`,
-//   };
-//   const mailToReceiver = {
-//     from: process.env.EMAIL_USER,
-//     to: rating.receiverUser,
-//     subject: 'Schedule the Event',
-//     text: `The user having email Id ${rating.schedulerUser} has scheduled an Event with You, having title ${rating.title} `,
-//   };
-
-//   await transporter.sendMail(mailToSender);
-//   await transporter.sendMail(mailToReceiver);
-//   return ;
-// };
 export const subscribeUsers =async (req:any)=>{
   const {subscriberId,subscribeeId}=req.body;
   try{
@@ -604,8 +576,6 @@ async function authorizeOAuth2(): Promise<OAuth2Client> {
   );
 
   // Optionally, you can set the refresh token if you have one
-  // oAuth2Client.setCredentials({ refresh_token: 'YOUR_REFRESH_TOKEN' });
-
   return oAuth2Client;
 }
 
@@ -640,13 +610,6 @@ async function createGoogleCalendarEvent(auth: OAuth2Client, rating: Events): Pr
 
 // Generate the Google Calendar event link
 function generateGoogleCalendarLink(rating: Events,flag:boolean): string {
-  // const startDateTime = new Date(rating.eventDate).toISOString();
-  // const endDateTime = new Date(new Date(rating.eventDate).getTime() + 30 * 60 * 1000).toISOString(); // 30 mins duration
-  // const eventSummary = encodeURIComponent(`Meeting: ${rating.title}`);
-  // const eventDescription = encodeURIComponent(`Scheduled meet with ${rating.receiverUser}.`);
-  // console.log("startDateTime",startDateTime);
-  // console.log("endDateTime",endDateTime);
-  // return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventSummary}&dates=${startDateTime}/${endDateTime}&details=${eventDescription}&attendees=${encodeURIComponent(rating.receiverUser)}`;
   const startDateTime = new Date(rating.eventDate);
   const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000); // 30 mins duration
 
